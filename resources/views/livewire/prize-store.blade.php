@@ -3,15 +3,15 @@
     <div class="text-center">
         <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Dyqani i Çmimeve</h2>
         <p class="text-gray-600 dark:text-gray-400 mt-2">
-            Shkembeni monedhat tuaja për çmima të jashtëzakonshme!
+            Shkembeni eurot tuaja për çmima të jashtëzakonshme!
         </p>
         @auth
-            <div class="mt-4 inline-block bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
-                <span class="text-sm text-gray-600 dark:text-gray-400">Bilanci Juaj: </span>
-                <span class="font-bold text-blue-600 dark:text-blue-400">
-                    {{ number_format(auth()->user()->balance) }} monedha
-                </span>
-            </div>
+                                <div class="mt-4 inline-block bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Bilanci Juaj: </span>
+                        <span class="font-bold text-blue-600 dark:text-blue-400">
+                            €{{ number_format(auth()->user()->balance) }}
+                        </span>
+                    </div>
         @endauth
     </div>
 
@@ -49,7 +49,7 @@
                     <!-- Cost and Button -->
                     <div class="flex items-center justify-between">
                         <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                            {{ number_format($prize['cost']) }} tokens
+                            €{{ number_format($prize['cost']) }}
                         </div>
                         
                         @auth
@@ -62,7 +62,7 @@
                                 </button>
                             @else
                                 <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-md font-medium cursor-not-allowed">
-                                    Not Enough Tokens
+                                    Not Enough Euros
                                 </button>
                             @endif
                         @else
@@ -99,7 +99,7 @@
                             
                             <div class="text-right">
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ number_format($claim->token_cost) }} tokens
+                                    €{{ number_format($claim->token_cost) }}
                                 </div>
                                 <div class="text-xs">
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
@@ -131,7 +131,7 @@
             <div>
                 <div class="text-3xl mb-2">📈</div>
                 <div class="font-medium text-gray-900 dark:text-white">Trade on Markets</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">Make predictions and earn tokens</div>
+                                        <div class="text-sm text-gray-600 dark:text-gray-400">Make predictions and earn euros</div>
             </div>
             <div>
                 <div class="text-3xl mb-2">🎁</div>

@@ -73,7 +73,7 @@
                         <div class="flex justify-between items-center">
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Kosto e Vlerësuar:</span>
                             <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                                ${{ number_format($estimatedCost, 2) }}
+                                €{{ number_format($estimatedCost, 2) }}
                             </span>
                         </div>
                         
@@ -83,7 +83,7 @@
 
                         @auth
                             <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                Bilanci juaj: ${{ number_format(auth()->user()->balance, 2) }}
+                                Bilanci juaj: €{{ number_format(auth()->user()->balance, 2) }}
                             </div>
                         @endauth
                     </div>

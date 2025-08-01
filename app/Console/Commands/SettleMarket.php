@@ -113,7 +113,7 @@ class SettleMarket extends Command
             $totalWinners = $winningPositions->count();
             $totalLosers = $losingPositions->count();
             $totalWinningShares = $winningPositions->sum('shares');
-            $totalPayout = $totalWinningShares; // $1 per winning share
+            $totalPayout = $totalWinningShares; // €1 per winning share
 
             $this->newLine();
             $this->info("💰 Settlement Summary:");
@@ -121,7 +121,7 @@ class SettleMarket extends Command
             $this->line("👥 Winners: {$totalWinners} positions");
             $this->line("👥 Losers: {$totalLosers} positions");
             $this->line("📊 Winning shares: " . number_format($totalWinningShares, 2));
-            $this->line("💵 Total payout: $" . number_format($totalPayout, 2));
+                                $this->line("💵 Total payout: €" . number_format($totalPayout, 2));
 
             if ($winningPositions->count() > 0) {
                 $this->newLine();
@@ -129,12 +129,13 @@ class SettleMarket extends Command
                 $winnersTable = [];
                 foreach ($winningPositions as $position) {
                     $payout = (float) $position->shares;
+                    $cost = (float) $position->cost;
                     $winnersTable[] = [
                         $position->user->name,
                         number_format($position->shares, 2),
-                        '$' . number_format($position->cost, 2),
-                        '$' . number_format($payout, 2),
-                        '$' . number_format($payout - $position->cost, 2),
+                        '€' . number_format($cost, 2),
+                        '€' . number_format($payout, 2),
+                        '€' . number_format($payout - $cost, 2),
                     ];
                 }
 

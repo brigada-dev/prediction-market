@@ -226,7 +226,7 @@ class MarketMaker
         ];
 
         foreach ($winningPositions as $position) {
-            // Pay out $1 per share for winning positions
+            // Pay out €1 per share for winning positions
             $payout = (float) $position->shares;
             $profit = $payout - (float) $position->cost;
             
@@ -337,7 +337,7 @@ class MarketMaker
         $losingPositions = $resolvedPositions->filter(fn($p) => $p->choice !== $p->market->outcome);
         
         $totalInvested = $resolvedPositions->sum('cost');
-        $totalPayout = $winningPositions->sum('shares'); // $1 per winning share
+        $totalPayout = $winningPositions->sum('shares'); // €1 per winning share
         $totalProfit = $totalPayout - $totalInvested;
         
         return [

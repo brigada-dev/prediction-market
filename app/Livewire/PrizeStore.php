@@ -42,7 +42,7 @@ class PrizeStore extends Component
             'image' => '🖱️'
         ],
         [
-            'name' => 'Book Voucher ($25)',
+            'name' => 'Book Voucher (€25)',
             'description' => 'Amazon gift card for purchasing books',
             'cost' => 2500,
             'image' => '📚'

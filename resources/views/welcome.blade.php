@@ -154,16 +154,16 @@
                         <div class="space-y-3 mb-6">
                             <div class="flex justify-between items-center p-3 bg-green-50 rounded-xl border border-green-100">
                                 <span class="font-medium text-green-800">PO</span>
-                                <span class="font-bold text-green-700 text-lg">{{ $stats['probability_yes'] }}¢</span>
+                                <span class="font-bold text-green-700 text-lg">{{ $stats['probability_yes'] }}€</span>
                             </div>
                             <div class="flex justify-between items-center p-3 bg-red-50 rounded-xl border border-red-100">
                                 <span class="font-medium text-red-800">JO</span>
-                                <span class="font-bold text-red-700 text-lg">{{ $stats['probability_no'] }}¢</span>
+                                <span class="font-bold text-red-700 text-lg">{{ $stats['probability_no'] }}€</span>
                             </div>
                         </div>
                         
                         <div class="flex justify-between text-xs text-gray-500 mb-4 bg-gray-50 p-3 rounded-lg">
-                            <span>{{ number_format($stats['total_volume'], 0) }} tok</span>
+                            <span>{{ number_format($stats['total_volume'], 0) }} €</span>
                             <span>{{ $market->closes_at->format('M j') }}</span>
                         </div>
                         
@@ -234,26 +234,26 @@
         </div>
     </section>
 
-    <!-- Token Earning Section -->
+    <!-- Euro Earning Section -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
                 <div class="max-w-3xl">
-                    <h2 class="text-3xl font-bold mb-4">Shumë Rruga për me Fitua Monedha</h2>
-                    <p class="text-blue-100 mb-6">Filloni me 1,000 monedha falas dhe fitoni më shumë përmes aktiviteteve të ndryshme</p>
+                    <h2 class="text-3xl font-bold mb-4">Shumë Rruga për me Fitua Euro</h2>
+                    <p class="text-blue-100 mb-6">Filloni me €1,000 falas dhe fitoni më shumë përmes aktiviteteve të ndryshme</p>
                     
                     <div class="grid sm:grid-cols-2 gap-4 mb-6">
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Shihni Reklama</div>
-                            <div class="text-sm text-blue-100">10-25 monedha për reklam</div>
+                            <div class="text-sm text-blue-100">€10-25 për reklam</div>
                         </div>
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Hyrje e Përditsshme</div>
-                            <div class="text-sm text-blue-100">100 monedha çdo ditë</div>
+                            <div class="text-sm text-blue-100">€100 çdo ditë</div>
                         </div>
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Kryeni Detyra</div>
-                            <div class="text-sm text-blue-100">50-150 monedha</div>
+                            <div class="text-sm text-blue-100">€50-150</div>
                         </div>
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Fitoni Parashikime</div>

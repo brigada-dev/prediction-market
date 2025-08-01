@@ -98,7 +98,7 @@
                                             </div>
                                             <div class="text-right">
                                                 <div class="text-sm text-gray-600 dark:text-gray-400">
-                                                    Kosto: ${{ number_format($position->cost, 2) }}
+                                                    Kosto: €{{ number_format($position->cost, 2) }}
                                                 </div>
                                                 <div class="text-xs text-gray-500 dark:text-gray-500">
                                                     {{ $position->created_at->format('M j, g:i A') }}
@@ -126,7 +126,7 @@
                                         </div>
                                         <div>
                                             <div class="text-gray-600 dark:text-gray-400">Totali i Investuar</div>
-                                            <div class="font-medium text-gray-900 dark:text-white">${{ number_format($totalCost, 2) }}</div>
+                                            <div class="font-medium text-gray-900 dark:text-white">€{{ number_format($totalCost, 2) }}</div>
                                         </div>
                                     </div>
                                 </div>

@@ -84,22 +84,22 @@
                             <div class="bg-green-50 border border-green-200 rounded-xl p-4">
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold text-green-800">PO</span>
-                                    <span class="text-2xl font-bold text-green-700">{{ $stats['probability_yes'] }}¢</span>
+                                    <span class="text-2xl font-bold text-green-700">{{ $stats['probability_yes'] }}€</span>
                                 </div>
-                                <div class="text-xs text-green-600 mt-1">+{{ rand(1, 5) }}¢ sot</div>
+                                                                  <div class="text-xs text-green-600 mt-1">+{{ rand(1, 5) }}€ sot</div>
                             </div>
                             <div class="bg-red-50 border border-red-200 rounded-xl p-4">
                                 <div class="flex justify-between items-center">
                                     <span class="font-semibold text-red-800">JO</span>
-                                    <span class="text-2xl font-bold text-red-700">{{ $stats['probability_no'] }}¢</span>
+                                    <span class="text-2xl font-bold text-red-700">{{ $stats['probability_no'] }}€</span>
                                 </div>
-                                <div class="text-xs text-red-600 mt-1">-{{ rand(1, 3) }}¢ sot</div>
+                                                                  <div class="text-xs text-red-600 mt-1">-{{ rand(1, 3) }}€ sot</div>
                             </div>
                         </div>
 
                         <div class="flex justify-between items-center mb-4">
                             <div class="flex space-x-4 text-sm text-gray-500">
-                                <span>{{ number_format($stats['total_volume'], 0) }} tok</span>
+                                <span>{{ number_format($stats['total_volume'], 0) }} €</span>
                                 <span>•</span>
                                 <span>{{ $stats['total_positions'] }} tregtarë</span>
                             </div>
@@ -154,11 +154,11 @@
                     </div>
                     <div>
                         <div class="text-green-600 dark:text-green-400 font-semibold mb-2">🎯 Parashikimet e Sakta Fitojnë</div>
-                        <p class="text-gray-600 dark:text-gray-400">Kur tregjti zgjidhen, aksionet fitüese paguajnë monedha. Sa më të sakta parashikimet tuaja, aq më shumë fitoni.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Kur tregjti zgjidhen, aksionet fitüese paguajnë euro. Sa më të sakta parashikimet tuaja, aq më shumë fitoni.</p>
                     </div>
                     <div>
                         <div class="text-purple-600 dark:text-purple-400 font-semibold mb-2">🏆 Shkembeni Shpërblime</div>
-                        <p class="text-gray-600 dark:text-gray-400">Përdorni monedhat e fituara për të marra çmima nga dyqani ynë ose konkurroni në tregjti të reja.</p>
+                        <p class="text-gray-600 dark:text-gray-400">Përdorni eurot e fituara për të marra çmima nga dyqani ynë ose konkurroni në tregjti të reja.</p>
                     </div>
                 </div>
             </div>
