@@ -128,11 +128,12 @@ class SettleMarket extends Command
                 $this->info("🏆 Winners:");
                 $winnersTable = [];
                 foreach ($winningPositions as $position) {
-                    $payout = (float) $position->shares;
+                    $shares = (float) $position->shares;
                     $cost = (float) $position->cost;
+                    $payout = $shares;
                     $winnersTable[] = [
                         $position->user->name,
-                        number_format($position->shares, 2),
+                        number_format($shares, 2),
                         '€' . number_format($cost, 2),
                         '€' . number_format($payout, 2),
                         '€' . number_format($payout - $cost, 2),
