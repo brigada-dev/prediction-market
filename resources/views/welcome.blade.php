@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="transition-theme">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,9 @@
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+        .dark .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
         .card-hover {
             transition: all 0.3s ease;
         }
@@ -18,11 +21,32 @@
             transform: translateY(-2px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
+        .dark .card-hover:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
     </style>
+    <!-- Theme initialization script -->
+    <script>
+        // Initialize theme on page load
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme') || 'light';
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (error) {
+                console.warn('Theme initialization failed:', error);
+                // Fallback to light mode
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900 transition-theme">
     <!-- Navigation -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-lg bg-white/95">
+    <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 backdrop-blur-lg bg-white/95 dark:bg-gray-800/95 transition-theme">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
@@ -31,30 +55,33 @@
                         <div class="w-9 h-9 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
                             <span class="text-white font-bold text-lg">K</span>
                         </div>
-                        <span class="font-bold text-xl text-gray-900">PredictX</span>
+                        <span class="font-bold text-xl text-gray-900 dark:text-white transition-theme">PredictX</span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('markets.index') }}" class="text-gray-700 hover:text-gray-900 font-medium text-sm">Tregjet</a>
-                    <a href="{{ route('prizes.index') }}" class="text-gray-700 hover:text-gray-900 font-medium text-sm">Çmimet</a>
-                    <a href="#" class="text-gray-700 hover:text-gray-900 font-medium text-sm">Rreth Nesh</a>
+                    <a href="{{ route('markets.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm transition-theme">Tregjet</a>
+                    <a href="{{ route('prizes.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm transition-theme">Çmimet</a>
+                    <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm transition-theme">Rreth Nesh</a>
                 </div>
 
                 <!-- Auth Links -->
                 <div class="flex items-center space-x-3">
+                    <!-- Theme Toggle -->
+                    <x-simple-theme-toggle />
+                    
                     @auth
                         <div class="flex items-center space-x-3">
-                            <div class="bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg">
-                                <span class="text-sm font-semibold text-green-700">€{{ number_format(auth()->user()->balance, 2) }}</span>
+                            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-3 py-1.5 rounded-lg transition-theme">
+                                <span class="text-sm font-semibold text-green-700 dark:text-green-300">€{{ number_format(auth()->user()->balance, 2) }}</span>
                             </div>
                             <a href="{{ route('dashboard') }}" class="gradient-bg text-white px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity text-sm">
                                 Paneli Im
                             </a>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900 font-medium text-sm px-4 py-2">Kyçuni</a>
+                        <a href="{{ route('login') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm px-4 py-2 transition-theme">Kyçuni</a>
                         <a href="{{ route('register') }}" class="gradient-bg text-white px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity text-sm">
                             Regjistrohuni
                         </a>
@@ -65,28 +92,28 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="relative bg-white py-24">
+    <section class="relative bg-white dark:bg-gray-800 py-24 transition-theme">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <div class="mb-8">
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-purple-100 text-purple-800 mb-6">
+                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300 mb-6 transition-theme">
                         🎯 Platforma e parë e parashikimeve në Kosovë
                     </span>
                 </div>
-                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight transition-theme">
                     Tregtoni mbi
                     <span class="text-transparent bg-clip-text gradient-bg">
                         ardhmen
                     </span>
                 </h1>
-                <p class="text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+                <p class="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-3xl mx-auto leading-relaxed transition-theme">
                     Parashikoni ngjarjet e ardhshme dhe fitoni para reale. Nga zgjedhjet dhe ekonomia deri tek sporti dhe teknologjia - mendimi juaj ka vlerë.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                     <a href="{{ route('markets.index') }}" class="gradient-bg text-white px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity text-lg shadow-lg">
                         Shikoni Tregjet
                     </a>
-                    <a href="#how-it-works" class="border-2 border-gray-200 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all text-lg">
+                    <a href="#how-it-works" class="border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-8 py-4 rounded-xl font-semibold hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-lg transition-theme">
                         Si Funksionon
                     </a>
                 </div>
@@ -94,16 +121,16 @@
                 <!-- Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 mb-2">{{ $featuredMarkets->count() }}+</div>
-                        <div class="text-gray-600 font-medium">Tregje Aktive</div>
+                        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">{{ $featuredMarkets->count() }}+</div>
+                        <div class="text-gray-600 dark:text-gray-400 font-medium transition-theme">Tregje Aktive</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 mb-2">€10,000+</div>
-                        <div class="text-gray-600 font-medium">Volum i Tregtimit</div>
+                        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">€10,000+</div>
+                        <div class="text-gray-600 dark:text-gray-400 font-medium transition-theme">Volum i Tregtimit</div>
                     </div>
                     <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 mb-2">500+</div>
-                        <div class="text-gray-600 font-medium">Tregtarë Aktivë</div>
+                        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">500+</div>
+                        <div class="text-gray-600 dark:text-gray-400 font-medium transition-theme">Tregtarë Aktivë</div>
                     </div>
                 </div>
             </div>
@@ -112,11 +139,11 @@
 
     <!-- Featured Markets -->
     @if($featuredMarkets->count() > 0)
-    <section class="py-20 bg-gray-50">
+    <section class="py-20 bg-gray-50 dark:bg-gray-900 transition-theme">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Tregjet më të Popullarizuara</h2>
-                <p class="text-lg text-gray-600">Tregtoni mbi ngjarjet që po diskutohen më shumë</p>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">Tregjet më të Popullarizuara</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 transition-theme">Tregtoni mbi ngjarjet që po diskutohen më shumë</p>
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -125,44 +152,44 @@
                         $marketMaker = app(\App\Services\MarketMaker::class);
                         $stats = $marketMaker->getMarketStats($market);
                     @endphp
-                    <div class="bg-white border border-gray-200 rounded-2xl p-6 card-hover">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 card-hover transition-theme">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex-1">
-                                <h3 class="font-semibold text-gray-900 line-clamp-2 text-lg mb-2">
+                                <h3 class="font-semibold text-gray-900 dark:text-white line-clamp-2 text-lg mb-2 transition-theme">
                                     {{ $market->title }}
                                 </h3>
                                 @if($market->resolved)
-                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 transition-theme">
                                         ✓ I Zgjidhur
                                     </span>
                                 @elseif($market->isClosed())
-                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 transition-theme">
                                         I Mbyllur
                                     </span>
                                 @else
-                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-600">
+                                    <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 transition-theme">
                                         🔥 Aktiv
                                     </span>
                                 @endif
                             </div>
                         </div>
                         
-                        <p class="text-gray-600 text-sm mb-6 line-clamp-2">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-6 line-clamp-2 transition-theme">
                             {{ $market->description }}
                         </p>
                         
                         <div class="space-y-3 mb-6">
-                            <div class="flex justify-between items-center p-3 bg-green-50 rounded-xl border border-green-100">
-                                <span class="font-medium text-green-800">PO</span>
-                                <span class="font-bold text-green-700 text-lg">{{ $stats['probability_yes'] }}€</span>
+                            <div class="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-700 transition-theme">
+                                <span class="font-medium text-green-800 dark:text-green-300">PO</span>
+                                <span class="font-bold text-green-700 dark:text-green-300 text-lg">{{ $stats['probability_yes'] }}€</span>
                             </div>
-                            <div class="flex justify-between items-center p-3 bg-red-50 rounded-xl border border-red-100">
-                                <span class="font-medium text-red-800">JO</span>
-                                <span class="font-bold text-red-700 text-lg">{{ $stats['probability_no'] }}€</span>
+                            <div class="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-700 transition-theme">
+                                <span class="font-medium text-red-800 dark:text-red-300">JO</span>
+                                <span class="font-bold text-red-700 dark:text-red-300 text-lg">{{ $stats['probability_no'] }}€</span>
                             </div>
                         </div>
                         
-                        <div class="flex justify-between text-xs text-gray-500 mb-4 bg-gray-50 p-3 rounded-lg">
+                        <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-4 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg transition-theme">
                             <span>{{ number_format($stats['total_volume'], 0) }} €</span>
                             <span>{{ $market->closes_at->format('M j') }}</span>
                         </div>
@@ -189,11 +216,11 @@
     @endif
 
     <!-- How It Works Section -->
-    <section id="how-it-works" class="py-20 bg-white">
+    <section id="how-it-works" class="py-20 bg-white dark:bg-gray-800 transition-theme">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Si Funksionon</h2>
-                <p class="text-lg text-gray-600">Tre hapa të thjeshtë për të filluar tregtimin e parashikimeve</p>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">Si Funksionon</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 transition-theme">Tre hapa të thjeshtë për të filluar tregtimin e parashikimeve</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-12">
@@ -201,31 +228,31 @@
                     <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <span class="text-3xl">👤</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">1. Regjistrohuni</h3>
-                    <p class="text-gray-600 leading-relaxed">Krijoni llogarinë tuaj falas dhe merrni €100 virtuale për të filluar tregtimin</p>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">1. Regjistrohuni</h3>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed transition-theme">Krijoni llogarinë tuaj falas dhe merrni €100 virtuale për të filluar tregtimin</p>
                 </div>
                 
                 <div class="text-center">
                     <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <span class="text-3xl">📈</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">2. Tregtoni</h3>
-                    <p class="text-gray-600 leading-relaxed">Zgjidhni një ngjarje dhe blini aksione PO ose JO bazuar në mendimin tuaj</p>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">2. Tregtoni</h3>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed transition-theme">Zgjidhni një ngjarje dhe blini aksione PO ose JO bazuar në mendimin tuaj</p>
                 </div>
                 
                 <div class="text-center">
                     <div class="w-20 h-20 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                         <span class="text-3xl">💎</span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">3. Fitoni</h3>
-                    <p class="text-gray-600 leading-relaxed">Nëse parashikimi juaj është i saktë, aksionet tuaja vlejnë €1 secila</p>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">3. Fitoni</h3>
+                    <p class="text-gray-600 dark:text-gray-400 leading-relaxed transition-theme">Nëse parashikimi juaj është i saktë, aksionet tuaja vlejnë €1 secila</p>
                 </div>
             </div>
             
             <div class="text-center mt-16">
-                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-2xl">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Gati për të filluar?</h3>
-                    <p class="text-gray-600 mb-6">Bashkohuni me mijëra tregtarë që po fitojnë para nga parashikimet e tyre.</p>
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-8 rounded-2xl transition-theme">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">Gati për të filluar?</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-6 transition-theme">Bashkohuni me mijëra tregtarë që po fitojnë para nga parashikimet e tyre.</p>
                     <a href="{{ route('register') }}" class="gradient-bg text-white px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity text-lg inline-block">
                         Filloni Tash - Falas
                     </a>
@@ -235,34 +262,34 @@
     </section>
 
     <!-- Euro Earning Section -->
-    <section class="py-16 bg-white">
+    <section class="py-16 bg-white dark:bg-gray-800 transition-theme">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 rounded-2xl p-8 text-white">
                 <div class="max-w-3xl">
                     <h2 class="text-3xl font-bold mb-4">Shumë Rruga për me Fitua Euro</h2>
-                    <p class="text-blue-100 mb-6">Filloni me €1,000 falas dhe fitoni më shumë përmes aktiviteteve të ndryshme</p>
+                    <p class="text-blue-100 dark:text-blue-200 mb-6 transition-theme">Filloni me €1,000 falas dhe fitoni më shumë përmes aktiviteteve të ndryshme</p>
                     
                     <div class="grid sm:grid-cols-2 gap-4 mb-6">
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Shihni Reklama</div>
-                            <div class="text-sm text-blue-100">€10-25 për reklam</div>
+                            <div class="text-sm text-blue-100 dark:text-blue-200">€10-25 për reklam</div>
                         </div>
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Hyrje e Përditsshme</div>
-                            <div class="text-sm text-blue-100">€100 çdo ditë</div>
+                            <div class="text-sm text-blue-100 dark:text-blue-200">€100 çdo ditë</div>
                         </div>
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Kryeni Detyra</div>
-                            <div class="text-sm text-blue-100">€50-150</div>
+                            <div class="text-sm text-blue-100 dark:text-blue-200">€50-150</div>
                         </div>
                         <div class="bg-white/10 rounded-lg p-4">
                             <div class="font-semibold mb-1">Fitoni Parashikime</div>
-                            <div class="text-sm text-blue-100">Potencial të pakufishem fitimi</div>
+                            <div class="text-sm text-blue-100 dark:text-blue-200">Potencial të pakufishem fitimi</div>
                         </div>
                     </div>
                     
                     @guest
-                        <a href="{{ route('register') }}" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                        <a href="{{ route('register') }}" class="bg-white dark:bg-gray-100 text-blue-600 dark:text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-200 transition-colors">
                             Filloni me Fitua Tash
                         </a>
                     @endguest
@@ -273,11 +300,11 @@
 
     <!-- Recent Results -->
     @if($resolvedMarkets->count() > 0)
-    <section class="py-16 bg-gray-50">
+    <section class="py-16 bg-gray-50 dark:bg-gray-900 transition-theme">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Rezultate të Fundit</h2>
-                <p class="text-lg text-gray-600">Shihni si komuniteti i ka parashiku këto rezultate</p>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">Rezultate të Fundit</h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 transition-theme">Shihni si komuniteti i ka parashiku këto rezultate</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-6">
@@ -287,34 +314,34 @@
                         $stats = $marketMaker->getMarketStats($market);
                         $isCorrectPrediction = $market->outcome === 'yes' ? $stats['probability_yes'] > 50 : $stats['probability_no'] > 50;
                     @endphp
-                    <div class="bg-white border border-gray-200 rounded-xl p-6">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 transition-theme">
                         <div class="flex justify-between items-start mb-4">
-                            <h3 class="font-semibold text-gray-900 line-clamp-2 flex-1">
+                            <h3 class="font-semibold text-gray-900 dark:text-white line-clamp-2 flex-1 transition-theme">
                                 {{ $market->title }}
                             </h3>
                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                {{ $market->outcome === 'yes' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} ml-2">
+                                {{ $market->outcome === 'yes' ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300' }} ml-2 transition-theme">
                                 {{ strtoupper($market->outcome) }}
                             </span>
                         </div>
                         
                         <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1 transition-theme">
                                 <span>Parashikimi i Komunitetit</span>
-                                <span class="{{ $isCorrectPrediction ? 'text-green-600' : 'text-red-600' }}">
+                                <span class="{{ $isCorrectPrediction ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }} transition-theme">
                                     {{ $isCorrectPrediction ? 'I Saktë' : 'I Pasaktë' }}
                                 </span>
                             </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: {{ $stats['probability_yes'] }}%"></div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 transition-theme">
+                                <div class="bg-green-600 dark:bg-green-500 h-2 rounded-full" style="width: {{ $stats['probability_yes'] }}%"></div>
                             </div>
-                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 transition-theme">
                                 <span>{{ $stats['probability_yes'] }}% PO</span>
                                 <span>{{ $stats['probability_no'] }}% JO</span>
                             </div>
                         </div>
                         
-                        <div class="text-xs text-gray-500">
+                        <div class="text-xs text-gray-500 dark:text-gray-400 transition-theme">
                             <div>{{ $stats['total_positions'] }} tregtarë • Zgjidh {{ $market->updated_at->diffForHumans() }}</div>
                         </div>
                     </div>
@@ -325,25 +352,25 @@
     @endif
 
     <!-- CTA Section -->
-    <section class="py-16 bg-white">
+    <section class="py-16 bg-white dark:bg-gray-800 transition-theme">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Gati me Fillu me Parashiku?</h2>
-            <p class="text-lg text-gray-600 mb-8">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4 transition-theme">Gati me Fillu me Parashiku?</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 transition-theme">
                 Bashkohuni me mijëra përdorues që bëjnë parashikime dhe fitojnë shpërblime në PredictX
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 @guest
-                    <a href="{{ route('register') }}" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    <a href="{{ route('register') }}" class="bg-blue-600 dark:bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
                         Filloni - Asht Falas
                     </a>
-                    <a href="{{ route('markets.index') }}" class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                    <a href="{{ route('markets.index') }}" class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         Shfletoni Tregjti
                     </a>
                 @else
-                    <a href="{{ route('markets.index') }}" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    <a href="{{ route('markets.index') }}" class="bg-blue-600 dark:bg-blue-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
                         Filloni me Tregtua
                     </a>
-                    <a href="{{ route('prizes.index') }}" class="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                    <a href="{{ route('prizes.index') }}" class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         Shihni Çmimet
                     </a>
                 @endguest
@@ -397,7 +424,7 @@
             </div>
             
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-                <p>&copy; 2024 PredictX. Krejt të drejtat të rezervuara. Ndërtuar me Laravel.</p>
+                <p>&copy; 2024 parashiko.com. Krejt të drejtat të rezervuara. Ndërtuar me Laravel.</p>
             </div>
         </div>
     </footer>

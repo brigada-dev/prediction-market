@@ -23,6 +23,16 @@ Route::get('/', function () {
     return view('welcome', compact('featuredMarkets', 'resolvedMarkets'));
 })->name('home');
 
+// Debug route for theme testing
+Route::get('/debug-theme', function () {
+    return view('debug-theme');
+})->name('debug-theme');
+
+// Alpine.js test route
+Route::get('/test-alpine', function () {
+    return view('test-alpine');
+})->name('test-alpine');
+
 // Public market routes
 Route::get('/markets', [MarketController::class, 'index'])->name('markets.index');
 Route::get('/markets/{market}', [MarketController::class, 'show'])->name('markets.show');

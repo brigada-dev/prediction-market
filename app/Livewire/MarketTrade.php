@@ -25,6 +25,12 @@ class MarketTrade extends Component
     public array $stats = [];
     public float $estimatedCost = 0.0;
     public ?string $errorMessage = null;
+    public float $estimatedPayout = 0.0;
+    public float $estimatedProfitIfWin = 0.0;
+    public float $expectedValue = 0.0;
+    public float $breakEvenProbability = 0.0; // 0..1
+    public float $pricePerShare = 0.0;
+    public float $returnIfWinPct = 0.0;
 
     public function mount(Market $market): void
     {
@@ -56,9 +62,26 @@ class MarketTrade extends Component
         try {
             $this->estimatedCost = $marketMaker->costToBuy($this->market, $this->choice, $this->shares);
             $this->errorMessage = null;
+
+            // Derived metrics
+            $prices = $marketMaker->price($this->market);
+            $probability = $this->choice === 'yes' ? ($prices['yes'] ?? 0.5) : ($prices['no'] ?? 0.5);
+
+            $this->estimatedPayout = round(max(0, $this->shares), 2);
+            $this->pricePerShare = $this->shares > 0 ? round($this->estimatedCost / $this->shares, 4) : 0.0;
+            $this->estimatedProfitIfWin = round($this->estimatedPayout - $this->estimatedCost, 2);
+            $this->breakEvenProbability = $this->shares > 0 ? min(1.0, max(0.0, $this->estimatedCost / $this->shares)) : 0.0;
+            $this->expectedValue = round(($this->shares * $probability) - $this->estimatedCost, 2);
+            $this->returnIfWinPct = $this->estimatedCost > 0 ? round(($this->estimatedProfitIfWin / $this->estimatedCost) * 100, 1) : 0.0;
         } catch (\Exception $e) {
             $this->estimatedCost = 0.0;
             $this->errorMessage = 'Unable to calculate cost';
+            $this->estimatedPayout = 0.0;
+            $this->estimatedProfitIfWin = 0.0;
+            $this->expectedValue = 0.0;
+            $this->breakEvenProbability = 0.0;
+            $this->pricePerShare = 0.0;
+            $this->returnIfWinPct = 0.0;
         }
     }
 

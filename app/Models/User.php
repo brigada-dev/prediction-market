@@ -83,4 +83,21 @@ class User extends Authenticatable
     {
         return $this->hasMany(PrizeClaim::class);
     }
+
+    /**
+     * Get the user's initials derived from their name.
+     */
+    public function initials(): string
+    {
+        $name = trim((string) $this->name);
+        if ($name === '') {
+            return '';
+        }
+
+        $parts = preg_split('/\s+/', $name) ?: [];
+        $firstInitial = $parts !== [] ? mb_substr($parts[0], 0, 1) : '';
+        $lastInitial = count($parts) > 1 ? mb_substr($parts[count($parts) - 1], 0, 1) : '';
+
+        return mb_strtoupper($firstInitial . $lastInitial);
+    }
 }

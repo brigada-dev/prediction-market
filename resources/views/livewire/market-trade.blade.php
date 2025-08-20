@@ -68,21 +68,46 @@
                         @error('shares') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
-                    <!-- Cost Estimation -->
-                    <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <!-- Cost & Payout Estimation -->
+                    <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg space-y-2">
                         <div class="flex justify-between items-center">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Kosto e Vlerësuar:</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Kosto e Vlerësuar</span>
                             <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
                                 €{{ number_format($estimatedCost, 2) }}
                             </span>
                         </div>
-                        
+
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 dark:text-gray-300">Pagesa e Mundshme (nëse fiton)</span>
+                                <span class="font-semibold text-gray-900 dark:text-white">€{{ number_format($estimatedPayout, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 dark:text-gray-300">Fitimi i Mundshëm</span>
+                                <span class="font-semibold {{ $estimatedProfitIfWin >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">
+                                    €{{ number_format($estimatedProfitIfWin, 2) }} ({{ number_format($returnIfWinPct, 1) }}%)
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 dark:text-gray-300">Çmimi për Aksion</span>
+                                <span class="font-semibold text-gray-900 dark:text-white">€{{ number_format($pricePerShare, 4) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-700 dark:text-gray-300">EV (Vlera e Pritur)</span>
+                                <span class="font-semibold {{ $expectedValue >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' }}">€{{ number_format($expectedValue, 2) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center col-span-2">
+                                <span class="text-gray-700 dark:text-gray-300">Pragu i Barazimit</span>
+                                <span class="font-semibold text-gray-900 dark:text-white">{{ number_format($breakEvenProbability * 100, 1) }}%</span>
+                            </div>
+                        </div>
+
                         @if($errorMessage)
-                            <div class="text-red-500 text-sm mt-1">{{ $errorMessage }}</div>
+                            <div class="text-red-500 text-sm">{{ $errorMessage }}</div>
                         @endif
 
                         @auth
-                            <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
                                 Bilanci juaj: €{{ number_format(auth()->user()->balance, 2) }}
                             </div>
                         @endauth

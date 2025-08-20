@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="transition-theme">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,9 +16,28 @@
 
         <!-- Styles -->
         @livewireStyles
+
+        <!-- Theme initialization script -->
+        <script>
+            // Initialize theme on page load
+            (function() {
+                try {
+                    const theme = localStorage.getItem('theme') || 'light';
+                    if (theme === 'dark') {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                } catch (error) {
+                    console.warn('Theme initialization failed:', error);
+                    // Fallback to light mode
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
+        </script>
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+    <body class="transition-theme">
+        <div class="font-sans text-gray-900 dark:text-gray-100 antialiased transition-theme">
             {{ $slot }}
         </div>
 

@@ -6,23 +6,36 @@
     display: none;
 }
 
-/* Kalshi-inspired styles */
+/* Kalshi-inspired styles with dark mode support */
 @layer base {
     :root {
         --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-primary-dark: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
         --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --shadow-card-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        --shadow-card-hover-dark: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
     }
     
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         background-color: #f9fafb;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .dark body {
+        background-color: #0f172a;
+        color: #f1f5f9;
     }
 }
 
 @layer components {
     .gradient-bg {
         background: var(--gradient-primary);
+    }
+    
+    .dark .gradient-bg {
+        background: var(--gradient-primary-dark);
     }
     
     .card-hover {
@@ -34,33 +47,69 @@
         transform: translateY(-2px);
         box-shadow: var(--shadow-card-hover);
     }
+
+    .dark .card-hover {
+        box-shadow: var(--shadow-card-dark);
+    }
+
+    .dark .card-hover:hover {
+        box-shadow: var(--shadow-card-hover-dark);
+    }
     
     .btn-primary {
         @apply bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity;
+    }
+
+    .dark .btn-primary {
+        @apply bg-gradient-to-r from-blue-500 to-purple-500;
     }
     
     .btn-secondary {
         @apply border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all;
     }
+
+    .dark .btn-secondary {
+        @apply border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-800;
+    }
     
     .market-card {
         @apply bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:border-gray-300;
+    }
+
+    .dark .market-card {
+        @apply bg-gray-800 border-gray-700 hover:border-gray-600 hover:shadow-xl;
     }
     
     .price-box-yes {
         @apply bg-green-50 border border-green-200 rounded-xl p-4;
     }
+
+    .dark .price-box-yes {
+        @apply bg-green-900/20 border-green-700 text-green-300;
+    }
     
     .price-box-no {
         @apply bg-red-50 border border-red-200 rounded-xl p-4;
+    }
+
+    .dark .price-box-no {
+        @apply bg-red-900/20 border-red-700 text-red-300;
     }
     
     .nav-link {
         @apply text-gray-700 hover:text-gray-900 font-medium text-sm px-3 py-2 transition-colors;
     }
+
+    .dark .nav-link {
+        @apply text-gray-300 hover:text-white;
+    }
     
     .nav-link.active {
         @apply border-b-2 border-blue-500 text-blue-600;
+    }
+
+    .dark .nav-link.active {
+        @apply border-blue-400 text-blue-400;
     }
     
     .line-clamp-2 {
@@ -76,6 +125,27 @@
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
+
+    /* Dark mode specific components */
+    .theme-toggle {
+        @apply p-2 rounded-lg transition-colors duration-200;
+    }
+
+    .theme-toggle.light {
+        @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+    }
+
+    .dark .theme-toggle.light {
+        @apply bg-gray-700 text-gray-300 hover:bg-gray-600;
+    }
+
+    .theme-toggle.dark {
+        @apply bg-gray-800 text-gray-300 hover:bg-gray-700;
+    }
+
+    .dark .theme-toggle.dark {
+        @apply bg-gray-600 text-white hover:bg-gray-500;
+    }
 }
 
 @layer utilities {
@@ -85,5 +155,14 @@
     
     .text-shadow-sm {
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .text-shadow-sm {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Smooth transitions for theme switching */
+    .transition-theme {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 }
