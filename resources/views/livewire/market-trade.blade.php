@@ -14,20 +14,34 @@
         </div>
 
         <!-- Market Statistics -->
-        <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <div class="text-center">
-                <div class="text-2xl font-bold text-green-600">
-                    {{ $stats['probability_yes'] ?? 0 }}%
-                </div>
-                <div class="text-sm text-gray-600 dark:text-gray-300">Probabiliteti PO</div>
+        @if($market->choices()->exists())
+            @php $choiceProbs = $stats['choice_probabilities'] ?? []; @endphp
+            <div class="space-y-2 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                @foreach($market->choices as $c)
+                    @php $prob = $choiceProbs[$c->slug] ?? 0; @endphp
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-700 dark:text-gray-300">{{ $c->name }}</span>
+                            <span class="font-medium">{{ $prob }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                            <div class="h-2 rounded-full" style="width: {{ $prob }}%; background: linear-gradient(90deg, #00F0FF, #FF00A8);"></div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-red-600">
-                    {{ $stats['probability_no'] ?? 0 }}%
+        @else
+            <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600">{{ $stats['probability_yes'] ?? 0 }}%</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-300">Probabiliteti PO</div>
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-300">Probabiliteti JO</div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">{{ $stats['probability_no'] ?? 0 }}%</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-300">Probabiliteti JO</div>
+                </div>
             </div>
-        </div>
+        @endif
 
         <!-- Trading Form -->
         @auth
@@ -36,20 +50,29 @@
                     <!-- Choice Selection -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Zgjidhni Anën
+                            Zgjidhni Opsionin
                         </label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button type="button" 
-                                    wire:click="$set('choice', 'yes')"
-                                    class="px-4 py-2 text-sm font-medium rounded-md border {{ $choice === 'yes' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-green-600 border-green-300 hover:bg-green-50' }}">
-                                PO ({{ $stats['probability_yes'] ?? 0 }}%)
-                            </button>
-                            <button type="button" 
-                                    wire:click="$set('choice', 'no')"
-                                    class="px-4 py-2 text-sm font-medium rounded-md border {{ $choice === 'no' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-red-600 border-red-300 hover:bg-red-50' }}">
-                                JO ({{ $stats['probability_no'] ?? 0 }}%)
-                            </button>
-                        </div>
+                        @if($market->choices()->exists())
+                            @php $choiceProbs = $stats['choice_probabilities'] ?? []; @endphp
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                @foreach($market->choices as $c)
+                                    @php $prob = $choiceProbs[$c->slug] ?? 0; @endphp
+                                    <button type="button"
+                                            wire:click="$set('choice', '{{ $c->slug }}')"
+                                            class="px-4 py-2 text-sm font-medium rounded-md border {{ $choice === $c->slug ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                                        <div class="flex items-center justify-between">
+                                            <span>{{ $c->name }}</span>
+                                            <span class="text-xs opacity-80">{{ $prob }}%</span>
+                                        </div>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" wire:click="$set('choice', 'yes')" class="px-4 py-2 text-sm font-medium rounded-md border {{ $choice === 'yes' ? 'bg-green-600 text-white border-green-600' : 'bg-white text-green-600 border-green-300 hover:bg-green-50' }}">PO ({{ $stats['probability_yes'] ?? 0 }}%)</button>
+                                <button type="button" wire:click="$set('choice', 'no')" class="px-4 py-2 text-sm font-medium rounded-md border {{ $choice === 'no' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-red-600 border-red-300 hover:bg-red-50' }}">JO ({{ $stats['probability_no'] ?? 0 }}%)</button>
+                            </div>
+                        @endif
                         @error('choice') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 

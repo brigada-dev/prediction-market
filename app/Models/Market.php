@@ -50,6 +50,11 @@ class Market extends Model
         return $this->hasMany(Position::class);
     }
 
+    public function choices(): HasMany
+    {
+        return $this->hasMany(MarketChoice::class);
+    }
+
     /**
      * Get yes positions for the market.
      */

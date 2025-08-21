@@ -31,6 +31,7 @@ class User extends Authenticatable
         'email',
         'password',
         'balance',
+        'role',
     ];
 
     /**
@@ -65,6 +66,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'balance' => 'decimal:2',
+            'role' => 'string',
         ];
     }
 
@@ -99,5 +101,70 @@ class User extends Authenticatable
         $lastInitial = count($parts) > 1 ? mb_substr($parts[count($parts) - 1], 0, 1) : '';
 
         return mb_strtoupper($firstInitial . $lastInitial);
+    }
+
+    /**
+     * Check if the user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if the user is a normal user.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    /**
+     * Get user stats for admin dashboard.
+     */
+    public function getStatsAttribute(): array
+    {
+        return [
+            'total_positions' => $this->positions()->count(),
+            'total_invested' => $this->positions()->sum('cost'),
+            'total_shares' => $this->positions()->sum('shares'),
+            'active_markets' => $this->positions()->distinct('market_id')->count('market_id'),
+            'profit_loss' => $this->calculateProfitLoss(),
+        ];
+    }
+
+    /**
+     * Calculate user's current profit/loss.
+     */
+    private function calculateProfitLoss(): float
+    {
+        $totalCost = (float) $this->positions()->sum('cost');
+        $currentValue = 0;
+
+        foreach ($this->positions as $position) {
+            $market = $position->market;
+            if ($market->resolved) {
+                // Market is resolved - calculate actual payout
+                if ($market->outcome === $position->choice || 
+                    ($position->marketChoice && $market->outcome === $position->marketChoice->slug)) {
+                    $currentValue += $position->shares; // Winner gets $1 per share
+                }
+                // Losers get $0
+            } else {
+                // Market is active - use current market price
+                $marketMaker = app(\App\Services\MarketMaker::class);
+                $prices = $marketMaker->price($market);
+                
+                if ($position->marketChoice) {
+                    $currentPrice = $prices[$position->marketChoice->slug] ?? 0;
+                } else {
+                    $currentPrice = $prices[$position->choice] ?? 0;
+                }
+                
+                $currentValue += $position->shares * $currentPrice;
+            }
+        }
+
+        return round($currentValue - $totalCost, 2);
     }
 }

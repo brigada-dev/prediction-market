@@ -21,6 +21,7 @@ class Position extends Model
         'user_id',
         'market_id',
         'choice',
+        'choice_id',
         'shares',
         'cost',
     ];
@@ -52,5 +53,10 @@ class Position extends Model
     public function market(): BelongsTo
     {
         return $this->belongsTo(Market::class);
+    }
+
+    public function marketChoice(): BelongsTo
+    {
+        return $this->belongsTo(MarketChoice::class, 'choice_id');
     }
 }

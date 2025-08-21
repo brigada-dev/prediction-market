@@ -6,11 +6,21 @@
     display: none;
 }
 
-/* Kalshi-inspired styles with dark mode support */
+/* Parashiko brand styles with dark mode support */
 @layer base {
     :root {
-        --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --gradient-primary-dark: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        /* Brand palette */
+        --brand-midnight: #0A0F2C; /* depth, reliability */
+        --brand-cyan: #00F0FF; /* neon cyan */
+        --brand-magenta: #FF00A8; /* neon magenta */
+        --brand-electric-green: #39FF14; /* growth */
+        --brand-off-white: #F2F2F2;
+        --brand-graph-gray: #1A1A1A;
+
+        /* Gradients */
+        --gradient-primary: linear-gradient(135deg, #0A67FF 0%, var(--brand-cyan) 40%, #7C3AED 100%);
+        --gradient-primary-dark: linear-gradient(135deg, var(--brand-midnight) 0%, #1B1F4A 35%, #3A0CA3 70%, #0cf 100%);
+        --gradient-cyber: conic-gradient(from 180deg at 50% 50%, var(--brand-cyan), var(--brand-magenta), var(--brand-cyan));
         --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         --shadow-card-dark: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
@@ -19,12 +29,11 @@
     
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #f9fafb;
+        background-color: #0f172a;
         transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .dark body {
-        background-color: #0f172a;
         color: #f1f5f9;
     }
 }
@@ -38,6 +47,23 @@
         background: var(--gradient-primary-dark);
     }
     
+    /* Brand utilities */
+    .brand-gradient { background-image: var(--gradient-primary); }
+    .brand-cyber { background-image: var(--gradient-cyber); }
+    .text-brand-gradient {
+        background-image: var(--gradient-primary);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+    .neon-glow { box-shadow: 0 0 12px rgba(0, 240, 255, 0.6), 0 0 32px rgba(255, 0, 168, 0.35); }
+    .btn-brand {
+        @apply text-white font-semibold px-6 py-3 rounded-xl transition-colors;
+        background: linear-gradient(90deg, var(--brand-cyan), var(--brand-magenta));
+    }
+    .btn-brand:hover { filter: brightness(1.05); }
+    .badge-cyan { background-color: rgba(0,240,255,0.12); color: var(--brand-cyan); }
+
     .card-hover {
         transition: all 0.3s ease;
         box-shadow: var(--shadow-card);

@@ -51,6 +51,10 @@
                     @php
                         $marketMaker = app(\App\Services\MarketMaker::class);
                         $stats = $marketMaker->getMarketStats($market);
+                        $priceYes = $marketMaker->costToBuy($market, 'yes', 1);
+                        $priceNo = $marketMaker->costToBuy($market, 'no', 1);
+                        $profitYes = max(0, 1 - $priceYes);
+                        $profitNo = max(0, 1 - $priceNo);
                     @endphp
                     <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg dark:hover:shadow-xl transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600">
                         <div class="flex justify-between items-start mb-4">
@@ -82,18 +86,44 @@
 
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-xl p-4 transition-theme">
-                                <div class="flex justify-between items-center">
+                                <div class="flex items-center justify-between">
                                     <span class="font-semibold text-green-800 dark:text-green-300">PO</span>
-                                    <span class="text-2xl font-bold text-green-700 dark:text-green-300">{{ $stats['probability_yes'] }}€</span>
+                                    <span class="text-sm text-green-700 dark:text-green-300">{{ $stats['probability_yes'] }}%</span>
                                 </div>
-                                <div class="text-xs text-green-600 dark:text-green-400 mt-1">+{{ rand(1, 5) }}€ sot</div>
+                                <div class="mt-2 grid gap-1 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-green-700 dark:text-green-300">Çmimi/aksion</span>
+                                        <span class="font-semibold text-green-800 dark:text-green-200">€{{ number_format($priceYes, 2) }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-green-700 dark:text-green-300">Pagesa nëse fiton</span>
+                                        <span class="font-semibold text-green-800 dark:text-green-200">€1.00</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-green-700 dark:text-green-300">Fitimi i mundshëm</span>
+                                        <span class="font-semibold text-green-800 dark:text-green-200">€{{ number_format($profitYes, 2) }}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl p-4 transition-theme">
-                                <div class="flex justify-between items-center">
+                                <div class="flex items-center justify-between">
                                     <span class="font-semibold text-red-800 dark:text-red-300">JO</span>
-                                    <span class="text-2xl font-bold text-red-700 dark:text-red-300">{{ $stats['probability_no'] }}€</span>
+                                    <span class="text-sm text-red-700 dark:text-red-300">{{ $stats['probability_no'] }}%</span>
                                 </div>
-                                <div class="text-xs text-red-600 dark:text-red-400 mt-1">-{{ rand(1, 3) }}€ sot</div>
+                                <div class="mt-2 grid gap-1 text-sm">
+                                    <div class="flex justify-between">
+                                        <span class="text-red-700 dark:text-red-300">Çmimi/aksion</span>
+                                        <span class="font-semibold text-red-800 dark:text-red-200">€{{ number_format($priceNo, 2) }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-red-700 dark:text-red-300">Pagesa nëse fiton</span>
+                                        <span class="font-semibold text-red-800 dark:text-red-200">€1.00</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-red-700 dark:text-red-300">Fitimi i mundshëm</span>
+                                        <span class="font-semibold text-red-800 dark:text-red-200">€{{ number_format($profitNo, 2) }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

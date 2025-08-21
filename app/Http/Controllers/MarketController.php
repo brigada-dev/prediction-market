@@ -39,13 +39,34 @@ class MarketController extends Controller
 
         // Get market statistics from MarketMaker
         $stats = $marketMaker->getMarketStats($market);
+        
+        // Get historical price data for chart
+        $historicalData = $marketMaker->getHistoricalPrices($market, 24);
 
         // Get user's positions if authenticated
         $userPositions = Auth::check() 
             ? $market->positions()->where('user_id', Auth::id())->get()
             : collect();
 
-        return view('markets.show', compact('market', 'stats', 'userPositions'));
+        return view('markets.show', compact('market', 'stats', 'userPositions', 'historicalData'));
+    }
+
+    /**
+     * Get historical price data for API.
+     */
+    public function getHistoricalPrices(Request $request, Market $market, MarketMaker $marketMaker): JsonResponse
+    {
+        $hours = (int) $request->get('hours', 24);
+        
+        // Validate hours parameter
+        $validHours = [1, 6, 24, 168, 720]; // 1h, 6h, 1d, 1w, 1m
+        if (!in_array($hours, $validHours)) {
+            $hours = 24; // Default to 24 hours
+        }
+        
+        $historicalData = $marketMaker->getHistoricalPrices($market, $hours);
+        
+        return response()->json($historicalData);
     }
 
     /**
@@ -53,9 +74,13 @@ class MarketController extends Controller
      */
     public function trade(Request $request, Market $market, MarketMaker $marketMaker): JsonResponse|RedirectResponse
     {
+        $validChoices = $market->choices()->exists()
+            ? $market->choices->pluck('slug')->all()
+            : ['yes', 'no'];
+
         $request->validate([
-            'choice' => ['required', Rule::in(['yes', 'no'])],
-            'shares' => ['required', 'numeric', 'min:0.01', 'max:1000'],
+            'choice' => ['required', Rule::in($validChoices)],
+            'shares' => ['required', 'numeric', 'min:0.01'],
         ]);
 
         /** @var User $user */
@@ -67,10 +92,14 @@ class MarketController extends Controller
         $validation = $marketMaker->validateTrade($market, $choice, $shares, (float) $user->balance);
 
         if (!$validation['valid']) {
-            return response()->json([
-                'error' => 'Trade validation failed',
-                'errors' => $validation['errors']
-            ], 422);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'Trade validation failed',
+                    'errors' => $validation['errors']
+                ], 422);
+            }
+            
+            return redirect()->back()->withErrors(['trade' => implode(' ', $validation['errors'])]);
         }
 
         $cost = $validation['cost'];
@@ -78,35 +107,59 @@ class MarketController extends Controller
         try {
             DB::transaction(function () use ($user, $market, $choice, $shares, $cost, $marketMaker) {
                 // Create position with LMSR calculated cost
-                Position::create([
+                $payload = [
                     'user_id' => $user->id,
                     'market_id' => $market->id,
-                    'choice' => $choice,
                     'shares' => $shares,
                     'cost' => $cost,
-                ]);
+                ];
+                
+                if ($market->choices()->exists()) {
+                    $choiceModel = $market->choices->firstWhere('slug', $choice);
+                    $payload['choice_id'] = $choiceModel?->id;
+                } else {
+                    $payload['choice'] = $choice;
+                }
+                Position::create($payload);
 
                 // Update user balance
-                $user->balance = bcadd((string) $user->balance, '-' . (string) $cost, 2);
+                $newBalance = bcadd((string) $user->balance, '-' . (string) $cost, 2);
+                $user->setAttribute('balance', $newBalance);
                 $user->save();
 
                 // Clear market cache
                 $marketMaker->clearMarketCache($market);
             });
 
-            // Get updated market stats
-            $stats = $marketMaker->getMarketStats($market);
+            // Get choice name for display
+            $choiceName = $choice;
+            if ($market->choices()->exists()) {
+                $choiceModel = $market->choices->firstWhere('slug', $choice);
+                $choiceName = $choiceModel?->name ?? $choice;
+            } else {
+                $choiceName = strtoupper($choice);
+            }
 
-            return response()->json([
-                'success' => 'Trade executed successfully',
-                'cost' => $cost,
-                'shares' => $shares,
-                'choice' => $choice,
-                'user_balance' => $user->balance,
-                'market_stats' => $stats
-            ]);
+            if ($request->expectsJson()) {
+                $stats = $marketMaker->getMarketStats($market);
+                return response()->json([
+                    'success' => 'Trade executed successfully',
+                    'cost' => $cost,
+                    'shares' => $shares,
+                    'choice' => $choice,
+                    'user_balance' => $user->balance,
+                    'market_stats' => $stats
+                ]);
+            }
+
+            return redirect()->back()->with('success', "Trade executed successfully! You bought {$shares} {$choiceName} shares for \${$cost}.");
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Trade execution failed: ' . $e->getMessage()], 500);
+            if ($request->expectsJson()) {
+                return response()->json(['error' => 'Trade execution failed: ' . $e->getMessage()], 500);
+            }
+            
+            return redirect()->back()->withErrors(['trade' => 'Trade execution failed. Please try again.']);
         }
     }
 

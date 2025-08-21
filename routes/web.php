@@ -1,27 +1,13 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RewardController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    $featuredMarkets = \App\Models\Market::where('resolved', false)
-        ->where('closes_at', '>', now())
-        ->with(['positions'])
-        ->orderBy('created_at', 'desc')
-        ->limit(6)
-        ->get();
-    
-    $resolvedMarkets = \App\Models\Market::where('resolved', true)
-        ->with(['positions'])
-        ->orderBy('updated_at', 'desc')
-        ->limit(3)
-        ->get();
-    
-    return view('welcome', compact('featuredMarkets', 'resolvedMarkets'));
-})->name('home');
+Route::get('/', HomeController::class)->name('home');
 
 // Debug route for theme testing
 Route::get('/debug-theme', function () {
@@ -41,6 +27,11 @@ Route::get('/markets/{market}', [MarketController::class, 'show'])->name('market
 Route::get('/prizes', function () {
     return view('prizes.index');
 })->name('prizes.index');
+
+// API routes (no auth required for market data)
+Route::prefix('api')->group(function () {
+    Route::get('/markets/{market}/historical-prices', [MarketController::class, 'getHistoricalPrices'])->name('api.markets.historical-prices');
+});
 
 // Authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Attributes\Validate;
+use Illuminate\Validation\Rule;
 
 class MarketTrade extends Component
 {
     public Market $market;
     
-    #[Validate('required|in:yes,no')]
     public string $choice = 'yes';
     
     #[Validate('required|numeric|min:0.01|max:1000')]
@@ -35,8 +35,30 @@ class MarketTrade extends Component
     public function mount(Market $market): void
     {
         $this->market = $market;
+        // Default choice based on market type
+        if ($this->market->choices()->exists()) {
+            $first = $this->market->choices()->first();
+            $this->choice = $first?->slug ?? '';
+        } else {
+            $this->choice = 'yes';
+        }
         $this->updateStats();
         $this->updateEstimatedCost();
+    }
+
+    /**
+     * Dynamic validation rules to support multi-outcome markets.
+     */
+    public function rules(): array
+    {
+        $validChoices = $this->market->choices()->exists()
+            ? $this->market->choices->pluck('slug')->all()
+            : ['yes', 'no'];
+
+        return [
+            'choice' => ['required', Rule::in($validChoices)],
+            'shares' => ['required', 'numeric', 'min:0.01', 'max:1000'],
+        ];
     }
 
     public function updatedShares(): void
@@ -65,7 +87,11 @@ class MarketTrade extends Component
 
             // Derived metrics
             $prices = $marketMaker->price($this->market);
-            $probability = $this->choice === 'yes' ? ($prices['yes'] ?? 0.5) : ($prices['no'] ?? 0.5);
+            if ($this->market->choices()->exists()) {
+                $probability = (float) ($prices[$this->choice] ?? 0.5);
+            } else {
+                $probability = $this->choice === 'yes' ? ($prices['yes'] ?? 0.5) : ($prices['no'] ?? 0.5);
+            }
 
             $this->estimatedPayout = round(max(0, $this->shares), 2);
             $this->pricePerShare = $this->shares > 0 ? round($this->estimatedCost / $this->shares, 4) : 0.0;
@@ -117,13 +143,19 @@ class MarketTrade extends Component
                 $cost = $validation['cost'];
 
                 // Create position
-                Position::create([
+                $payload = [
                     'user_id' => $user->id,
                     'market_id' => $this->market->id,
-                    'choice' => $this->choice,
                     'shares' => $this->shares,
                     'cost' => $cost,
-                ]);
+                ];
+                if ($this->market->choices()->exists()) {
+                    $choiceModel = $this->market->choices->firstWhere('slug', $this->choice);
+                    $payload['choice_id'] = $choiceModel?->id;
+                } else {
+                    $payload['choice'] = $this->choice;
+                }
+                Position::create($payload);
 
                 // Update user balance
                 $user->balance = bcadd((string) $user->balance, '-' . (string) $cost, 2);
@@ -138,7 +170,11 @@ class MarketTrade extends Component
             $this->updateEstimatedCost();
             $this->shares = 1.0;
 
-            session()->flash('success', "Trade executed successfully! You bought {$this->shares} {$this->choice} shares for \${$validation['cost']}.");
+            $label = $this->market->choices()->exists()
+                ? ($this->market->choices->firstWhere('slug', $this->choice)?->name ?? $this->choice)
+                : strtoupper($this->choice);
+
+            session()->flash('success', "Trade executed successfully! You bought {$this->shares} {$label} shares for €{$validation['cost']}.");
 
             // Dispatch browser event to update balance in navbar
             $this->dispatch('balance-updated', balance: Auth::user()->balance);

@@ -16,12 +16,23 @@ class MarketMaker
     public function getLiquidity(Market $market): array
     {
         $cacheKey = "market_liquidity_{$market->id}";
-        
+
         return Cache::remember($cacheKey, now()->addMinutes(5), function () use ($market) {
+            // Multi-choice support: sum by choice_id when choices exist, else classic yes/no
+            if ($market->choices()->exists()) {
+                $totals = [];
+                foreach ($market->choices as $choice) {
+                    $totals[$choice->slug] = (float) Position::where('market_id', $market->id)
+                        ->where('choice_id', $choice->id)
+                        ->sum('shares');
+                }
+                return $totals;
+            }
+
             $yes = Position::where('market_id', $market->id)
                 ->where('choice', 'yes')
                 ->sum('shares');
-                
+
             $no = Position::where('market_id', $market->id)
                 ->where('choice', 'no')
                 ->sum('shares');
@@ -47,8 +58,23 @@ class MarketMaker
             return ['yes' => 0.5, 'no' => 0.5];
         }
 
-        $eYes = exp($liquidity['yes'] / $b);
-        $eNo = exp($liquidity['no'] / $b);
+        // Multi-choice: compute exp(q_i/b) for each outcome
+        if ($market->choices()->exists()) {
+            $expTotals = [];
+            foreach ($market->choices as $choice) {
+                $q = $liquidity[$choice->slug] ?? 0.0;
+                $expTotals[$choice->slug] = exp($q / $b);
+            }
+            $sum = array_sum($expTotals) ?: 1;
+            $prices = [];
+            foreach ($expTotals as $slug => $val) {
+                $prices[$slug] = round($val / $sum, 4);
+            }
+            return $prices;
+        }
+
+        $eYes = exp(($liquidity['yes'] ?? 0) / $b);
+        $eNo = exp(($liquidity['no'] ?? 0) / $b);
 
         $sum = $eYes + $eNo;
 
@@ -76,10 +102,30 @@ class MarketMaker
         $b = (float) $market->b;
         $liquidity = $this->getLiquidity($market);
 
-        $qYesBefore = $liquidity['yes'];
-        $qNoBefore = $liquidity['no'];
+        // Multi-choice path when choices exist: treat choice as slug
+        if ($market->choices()->exists()) {
+            $qBefore = [];
+            foreach ($market->choices as $c) {
+                $qBefore[$c->slug] = (float) ($liquidity[$c->slug] ?? 0.0);
+            }
+            $qAfter = $qBefore;
+            if (isset($qAfter[$choice])) {
+                $qAfter[$choice] += $shares;
+            }
 
-        // Calculate new quantities after purchase
+            $sumExpBefore = 0.0; $sumExpAfter = 0.0;
+            foreach ($qBefore as $q) { $sumExpBefore += exp($q / $b); }
+            foreach ($qAfter as $q) { $sumExpAfter += exp($q / $b); }
+
+            $costBefore = $b * log($sumExpBefore);
+            $costAfter = $b * log($sumExpAfter);
+            $cost = $costAfter - $costBefore;
+            return round(max(0.01, $cost), 4);
+        }
+
+        $qYesBefore = (float) ($liquidity['yes'] ?? 0);
+        $qNoBefore = (float) ($liquidity['no'] ?? 0);
+
         if ($choice === 'yes') {
             $qYesAfter = $qYesBefore + $shares;
             $qNoAfter = $qNoBefore;
@@ -88,7 +134,6 @@ class MarketMaker
             $qNoAfter = $qNoBefore + $shares;
         }
 
-        // LMSR cost function
         $costBefore = $b * log(exp($qYesBefore / $b) + exp($qNoBefore / $b));
         $costAfter = $b * log(exp($qYesAfter / $b) + exp($qNoAfter / $b));
 
@@ -135,19 +180,190 @@ class MarketMaker
      */
     public function getMarketStats(Market $market): array
     {
+        $market->loadMissing('choices');
         $liquidity = $this->getLiquidity($market);
         $prices = $this->price($market);
-        
-        $totalVolume = $liquidity['yes'] + $liquidity['no'];
+
         $totalPositions = Position::where('market_id', $market->id)->count();
 
+        // Multi-choice markets
+        if ($market->choices->isNotEmpty()) {
+            $totalVolume = array_sum(array_map(fn($v) => (float) $v, $liquidity));
+            // Probabilities per outcome in percent
+            $choiceProbabilities = [];
+            foreach ($prices as $slug => $p) {
+                $choiceProbabilities[$slug] = round(((float) $p) * 100, 1);
+            }
+            // Determine top outcome
+            arsort($choiceProbabilities);
+            $topSlug = array_key_first($choiceProbabilities);
+            $topChoice = $market->choices->firstWhere('slug', $topSlug);
+
+            return [
+                'liquidity' => $liquidity,
+                'prices' => $prices,
+                'total_volume' => round($totalVolume, 2),
+                'total_positions' => $totalPositions,
+                'probability_yes' => null,
+                'probability_no' => null,
+                'choice_probabilities' => $choiceProbabilities,
+                'top_choice' => $topSlug,
+                'top_choice_name' => $topChoice?->name,
+                'top_probability' => $topSlug !== null ? $choiceProbabilities[$topSlug] : null,
+            ];
+        }
+
+        // Binary markets (yes/no)
+        $totalVolume = (float) ($liquidity['yes'] ?? 0) + (float) ($liquidity['no'] ?? 0);
         return [
             'liquidity' => $liquidity,
             'prices' => $prices,
             'total_volume' => round($totalVolume, 2),
             'total_positions' => $totalPositions,
-            'probability_yes' => round($prices['yes'] * 100, 1),
-            'probability_no' => round($prices['no'] * 100, 1),
+            'probability_yes' => round(($prices['yes'] ?? 0) * 100, 1),
+            'probability_no' => round(($prices['no'] ?? 0) * 100, 1),
+        ];
+    }
+
+    /**
+     * Get historical price data for chart display.
+     */
+    public function getHistoricalPrices(Market $market, int $hours = 24): array
+    {
+        $cacheKey = "market_historical_prices_{$market->id}_{$hours}h";
+        
+        return Cache::remember($cacheKey, now()->addMinutes(10), function () use ($market, $hours) {
+            // Get positions over the specified time period
+            $startTime = now()->subHours($hours);
+            $positions = $market->positions()
+                ->where('created_at', '>=', $startTime)
+                ->orderBy('created_at')
+                ->get();
+            
+            if ($positions->isEmpty()) {
+                // Return current prices if no historical data
+                $currentPrices = $this->price($market);
+                $now = now();
+                return [
+                    'timestamps' => [$now->subHour()->toISOString(), $now->toISOString()],
+                    'prices' => [$currentPrices, $currentPrices]
+                ];
+            }
+            
+            // Calculate price evolution over time
+            $timePoints = [];
+            $priceHistory = [];
+            
+            // Add initial point (current prices before any trades in period)
+            $initialTime = $startTime;
+            $initialPrices = $this->calculatePricesAtTime($market, $initialTime);
+            $timePoints[] = $initialTime->toISOString();
+            $priceHistory[] = $initialPrices;
+            
+            // Calculate running liquidity and prices after each trade
+            $runningLiquidity = $this->getLiquidityAtTime($market, $initialTime);
+            
+            foreach ($positions as $position) {
+                // Update running liquidity
+                if ($market->choices()->exists()) {
+                    $choice = $position->marketChoice;
+                    if ($choice) {
+                        $runningLiquidity[$choice->slug] = ($runningLiquidity[$choice->slug] ?? 0) + $position->shares;
+                    }
+                } else {
+                    $runningLiquidity[$position->choice] = ($runningLiquidity[$position->choice] ?? 0) + $position->shares;
+                }
+                
+                // Calculate prices at this point
+                $prices = $this->calculatePricesFromLiquidity($market, $runningLiquidity);
+                $timePoints[] = $position->created_at->toISOString();
+                $priceHistory[] = $prices;
+            }
+            
+            // Add current point
+            $currentPrices = $this->price($market);
+            $timePoints[] = now()->toISOString();
+            $priceHistory[] = $currentPrices;
+            
+            return [
+                'timestamps' => $timePoints,
+                'prices' => $priceHistory
+            ];
+        });
+    }
+    
+    /**
+     * Get liquidity state at a specific time.
+     */
+    private function getLiquidityAtTime(Market $market, $time): array
+    {
+        $positions = $market->positions()
+            ->where('created_at', '<', $time)
+            ->get();
+        
+        if ($market->choices()->exists()) {
+            $liquidity = [];
+            foreach ($market->choices as $choice) {
+                $liquidity[$choice->slug] = (float) $positions
+                    ->where('choice_id', $choice->id)
+                    ->sum('shares');
+            }
+            return $liquidity;
+        }
+        
+        return [
+            'yes' => (float) $positions->where('choice', 'yes')->sum('shares'),
+            'no' => (float) $positions->where('choice', 'no')->sum('shares'),
+        ];
+    }
+    
+    /**
+     * Calculate prices at a specific time.
+     */
+    private function calculatePricesAtTime(Market $market, $time): array
+    {
+        $liquidity = $this->getLiquidityAtTime($market, $time);
+        return $this->calculatePricesFromLiquidity($market, $liquidity);
+    }
+    
+    /**
+     * Calculate prices from given liquidity state.
+     */
+    private function calculatePricesFromLiquidity(Market $market, array $liquidity): array
+    {
+        $b = (float) $market->b;
+        
+        if ($b <= 0) {
+            return $market->choices()->exists() 
+                ? array_fill_keys($market->choices->pluck('slug')->toArray(), 0.5)
+                : ['yes' => 0.5, 'no' => 0.5];
+        }
+        
+        if ($market->choices()->exists()) {
+            $expTotals = [];
+            foreach ($market->choices as $choice) {
+                $q = $liquidity[$choice->slug] ?? 0.0;
+                $expTotals[$choice->slug] = exp($q / $b);
+            }
+            $sum = array_sum($expTotals) ?: 1;
+            $prices = [];
+            foreach ($expTotals as $slug => $val) {
+                $prices[$slug] = round($val / $sum, 4);
+            }
+            return $prices;
+        }
+        
+        $eYes = exp(($liquidity['yes'] ?? 0) / $b);
+        $eNo = exp(($liquidity['no'] ?? 0) / $b);
+        $sum = $eYes + $eNo;
+        
+        if ($sum == 0) {
+            return ['yes' => 0.5, 'no' => 0.5];
+        }
+        
+        return [
+            'yes' => round($eYes / $sum, 4),
+            'no' => round($eNo / $sum, 4),
         ];
     }
 
@@ -157,6 +373,11 @@ class MarketMaker
     public function clearMarketCache(Market $market): void
     {
         Cache::forget("market_liquidity_{$market->id}");
+        // Clear historical price caches
+        for ($hours = 1; $hours <= 168; $hours *= 2) { // 1h, 2h, 4h, 8h, 16h, 32h, 64h, 128h (5+ days)
+            Cache::forget("market_historical_prices_{$market->id}_{$hours}h");
+        }
+        Cache::forget("market_historical_prices_{$market->id}_24h");
     }
 
     /**
@@ -165,9 +386,16 @@ class MarketMaker
     public function validateTrade(Market $market, string $choice, float $shares, float $userBalance): array
     {
         $errors = [];
-
-        if (!in_array($choice, ['yes', 'no'])) {
-            $errors[] = 'Invalid choice. Must be "yes" or "no".';
+        
+        if ($market->choices()->exists()) {
+            $validSlugs = $market->choices->pluck('slug')->all();
+            if (!in_array($choice, $validSlugs, true)) {
+                $errors[] = 'Invalid choice for this market.';
+            }
+        } else {
+            if (!in_array($choice, ['yes', 'no'], true)) {
+                $errors[] = 'Invalid choice. Must be "yes" or "no".';
+            }
         }
 
         if ($shares <= 0) {

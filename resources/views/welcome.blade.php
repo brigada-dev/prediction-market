@@ -91,46 +91,104 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="relative bg-white dark:bg-gray-800 py-24 transition-theme">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <div class="mb-8">
-                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-300 mb-6 transition-theme">
-                        🎯 Platforma e parë e parashikimeve në Kosovë
+    <!-- Focused Hero: Featured Market -->
+    <section class="relative overflow-hidden bg-gray-900 py-24 transition-theme">
+        <!-- Background candidate silhouettes (replace with actual images) -->
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute -left-10 top-10 w-60 h-60 rounded-full brand-gradient blur-3xl"></div>
+            <div class="absolute right-0 bottom-10 w-72 h-72 rounded-full brand-gradient blur-3xl"></div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="grid lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-7">
+                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-white/10 text-white mb-6">
+                        🎯 Treg i Veçuar
                     </span>
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+                        {{ $featuredMarket?->title ?? 'Treg i Veçuar' }}
+                    </h1>
+                    <p class="text-lg text-gray-200 max-w-2xl mb-8">
+                        {{ $featuredMarket?->description ?? 'Treg i hapur aktualisht.' }}
+                    </p>
+                    @if($featuredMarket)
+                        @php
+                            $mm = app(\App\Services\MarketMaker::class);
+                            $stats = $mm->getMarketStats($featuredMarket);
+                        @endphp
+                        @if($featuredMarket->choices()->exists())
+                            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-3xl mb-8">
+                                @foreach($featuredMarket->choices as $choice)
+                                    @php 
+                                        $slug = $choice->slug; 
+                                        $prob = $stats['choice_probabilities'][$slug] ?? 0; 
+                                        $price = $mm->costToBuy($featuredMarket, $slug, 1);
+                                    @endphp
+                                    <div class="rounded-xl border border-white/20 bg-white/5 p-4 text-white">
+                                        <div class="font-semibold">{{ $choice->name }}</div>
+                                        <div class="text-xs text-white/70">{{ $choice->party }}</div>
+                                        <div class="mt-2 flex justify-between text-sm"><span>Prob.</span><span class="font-bold">{{ $prob }}%</span></div>
+                                        <div class="flex justify-between text-sm"><span>Çmimi</span><span class="font-semibold">€{{ number_format($price,2) }}</span></div>
+                                        <div class="flex justify-between text-sm"><span>Fito</span><span class="font-semibold">€{{ number_format(1 - $price,2) }}</span></div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            @php $priceYes = $mm->costToBuy($featuredMarket, 'yes', 1); $priceNo = $mm->costToBuy($featuredMarket, 'no', 1); @endphp
+                            <div class="grid grid-cols-2 gap-4 max-w-xl mb-8">
+                                <div class="rounded-xl border border-green-500/40 bg-green-500/10 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-green-300 font-semibold">PO</span>
+                                        <span class="text-green-200 text-sm">{{ $stats['probability_yes'] }}%</span>
+                                    </div>
+                                    <div class="mt-2 text-sm text-green-100">Çmimi/aksion: <span class="font-semibold">€{{ number_format($priceYes, 2) }}</span></div>
+                                    <div class="text-sm text-green-100">Pagesa nëse fiton: <span class="font-semibold">€1.00</span></div>
+                                </div>
+                                <div class="rounded-xl border border-red-500/40 bg-red-500/10 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-red-300 font-semibold">JO</span>
+                                        <span class="text-red-200 text-sm">{{ $stats['probability_no'] }}%</span>
+                                    </div>
+                                    <div class="mt-2 text-sm text-red-100">Çmimi/aksion: <span class="font-semibold">€{{ number_format($priceNo, 2) }}</span></div>
+                                    <div class="text-sm text-red-100">Pagesa nëse fiton: <span class="font-semibold">€1.00</span></div>
+                                </div>
+                            </div>
+                        @endif
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="{{ route('markets.show', $featuredMarket) }}" class="btn-brand neon-glow inline-flex items-center justify-center">
+                                Parashiko Tash
+                            </a>
+                            <a href="#how-it-works" class="border border-white/20 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/10">Si Funksionon</a>
+                        </div>
+                    @endif
                 </div>
-                <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight transition-theme">
-                    Tregtoni mbi
-                    <span class="text-transparent bg-clip-text gradient-bg">
-                        ardhmen
-                    </span>
-                </h1>
-                <p class="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-3xl mx-auto leading-relaxed transition-theme">
-                    Parashikoni ngjarjet e ardhshme dhe fitoni para reale. Nga zgjedhjet dhe ekonomia deri tek sporti dhe teknologjia - mendimi juaj ka vlerë.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                    <a href="{{ route('markets.index') }}" class="gradient-bg text-white px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity text-lg shadow-lg">
-                        Shikoni Tregjet
-                    </a>
-                    <a href="#how-it-works" class="border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-8 py-4 rounded-xl font-semibold hover:border-gray-300 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-lg transition-theme">
-                        Si Funksionon
-                    </a>
-                </div>
-                
-                <!-- Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">{{ $featuredMarkets->count() }}+</div>
-                        <div class="text-gray-600 dark:text-gray-400 font-medium transition-theme">Tregje Aktive</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">€10,000+</div>
-                        <div class="text-gray-600 dark:text-gray-400 font-medium transition-theme">Volum i Tregtimit</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">500+</div>
-                        <div class="text-gray-600 dark:text-gray-400 font-medium transition-theme">Tregtarë Aktivë</div>
+                <div class="lg:col-span-5">
+                    <!-- Placeholder collage: replace with candidate images -->
+                    <div class="relative aspect-[4/5] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40"></div>
+                        <div class="absolute inset-0 grid grid-cols-3 gap-1 opacity-60">
+                            <div class="bg-white/10">
+                                <img src="{{ asset('images/perparim-rama.png') }}" alt="Përparim Rama" class="w-full h-full object-cover grayscale">
+                            </div>
+                            <div class="bg-white/10">
+                                <img src="{{ asset('images/hajrulla-ceku.png') }}" alt="Hajrulla Cekaj" class="w-full h-full object-cover grayscale">
+                            </div>
+                            <div class="bg-white/10">
+                                <img src="{{ asset('images/uran-ismaili.png') }}" alt="Uran Ismaili" class="w-full h-full object-cover grayscale">
+                            </div>
+                            <div class="bg-white/10">
+                                <img src="{{ asset('images/besa-shahini.png') }}" alt="Besa Shahini" class="w-full h-full object-cover grayscale">
+                            </div>
+                            <div class="bg-white/10">
+                                <img src="{{ asset('images/beke-berisha.png') }}" alt="Beke Berisha" class="w-full h-full object-cover grayscale">
+                            </div>
+                            <div class="bg-white/10">
+                                <img src="{{ asset('images/fatmir-selimi.png') }}" alt="Fatmir Selimi" class="w-full h-full object-cover grayscale">
+                            </div>
+                        </div>
+                        <div class="absolute bottom-4 left-4 right-4 text-white">
+                            <div class="text-sm text-white/80">Fushata në Prishtinë</div>
+                            <div class="text-xl font-semibold">Kandidatët në garë</div>
+                        </div>
                     </div>
                 </div>
             </div>
