@@ -13,39 +13,39 @@ class PrizeStore extends Component
     public array $prizes = [
         [
             'name' => 'Premium T-Shirt',
-            'description' => 'High-quality cotton t-shirt with prediction market logo',
+            'description' => 'High-quality cotton t-shirt with prediction market logo - entertainment item only, not redeemable for money',
             'cost' => 1000,
             'image' => '🎽'
         ],
         [
             'name' => 'Coffee Mug',
-            'description' => 'Ceramic mug perfect for your morning coffee',
+            'description' => 'Ceramic mug perfect for your morning coffee - entertainment item only, not redeemable for money',
             'cost' => 500,
             'image' => '☕'
         ],
         [
             'name' => 'Sticker Pack',
-            'description' => 'Collection of vinyl stickers for your laptop',
+            'description' => 'Collection of vinyl stickers for your laptop - entertainment item only, not redeemable for money',
             'cost' => 200,
             'image' => '🎫'
         ],
         [
             'name' => 'Prediction Market Hoodie',
-            'description' => 'Comfortable hoodie for prediction market enthusiasts',
+            'description' => 'Comfortable hoodie for prediction market enthusiasts - entertainment item only, not redeemable for money',
             'cost' => 2000,
             'image' => '👕'
         ],
         [
             'name' => 'Wireless Mouse Pad',
-            'description' => 'Premium mouse pad with wireless charging capability',
+            'description' => 'Premium mouse pad with wireless charging capability - entertainment item only, not redeemable for money',
             'cost' => 1500,
             'image' => '🖱️'
         ],
         [
-            'name' => 'Book Voucher (€25)',
-            'description' => 'Amazon gift card for purchasing books',
+            'name' => 'Digital Badge Collection',
+            'description' => 'Exclusive digital badges for your profile - entertainment only, not redeemable for money',
             'cost' => 2500,
-            'image' => '📚'
+            'image' => '🏆'
         ],
     ];
 

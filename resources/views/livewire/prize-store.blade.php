@@ -1,17 +1,20 @@
 <div class="space-y-8">
+    <!-- Arcade Banner -->
+    <x-arcade-banner />
+    
     <!-- Header -->
     <div class="text-center">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Dyqani i Çmimeve</h2>
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">🎮 {{ __('arcade.prize_store') }}</h2>
         <p class="text-gray-600 dark:text-gray-400 mt-2">
-            Shkembeni eurot tuaja për çmima të jashtëzakonshme!
+            {{ __('arcade.prize_store_subtitle') }}
         </p>
         @auth
-                                <div class="mt-4 inline-block bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Bilanci Juaj: </span>
-                        <span class="font-bold text-blue-600 dark:text-blue-400">
-                            €{{ number_format(auth()->user()->balance) }}
-                        </span>
-                    </div>
+            <div class="mt-4 inline-block bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-lg">
+                <span class="text-sm text-gray-600 dark:text-gray-400">🎮 {{ __('arcade.your_tokens') }}: </span>
+                <span class="font-bold text-blue-600 dark:text-blue-400">
+                    {{ number_format(auth()->user()->balance, 0) }} {{ __('arcade.tokens') }}
+                </span>
+            </div>
         @endauth
     </div>
 
@@ -49,7 +52,7 @@
                     <!-- Cost and Button -->
                     <div class="flex items-center justify-between">
                         <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                            €{{ number_format($prize['cost']) }}
+                            🎮 {{ number_format($prize['cost']) }} {{ __('arcade.tokens') }}
                         </div>
                         
                         @auth
@@ -57,18 +60,18 @@
                                 <button wire:click="redeem('{{ $prize['name'] }}', '{{ $prize['description'] }}', {{ $prize['cost'] }})"
                                         wire:loading.attr="disabled"
                                         class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md font-medium transition-colors">
-                                    <span wire:loading.remove wire:target="redeem">Redeem</span>
-                                    <span wire:loading wire:target="redeem">Processing...</span>
+                                    <span wire:loading.remove wire:target="redeem">{{ __('arcade.redeem') }}</span>
+                                    <span wire:loading wire:target="redeem">{{ __('Processing...') }}</span>
                                 </button>
                             @else
                                 <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-md font-medium cursor-not-allowed">
-                                    Not Enough Euros
+                                    {{ __('arcade.not_enough_tokens') }}
                                 </button>
                             @endif
                         @else
                             <a href="{{ route('login') }}" 
                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors">
-                                Login to Redeem
+                                {{ __('arcade.login_to_redeem') }}
                             </a>
                         @endauth
                     </div>

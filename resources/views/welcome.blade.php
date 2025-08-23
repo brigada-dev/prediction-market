@@ -475,8 +475,8 @@
                     <h4 class="font-semibold mb-4">Përkrahja</h4>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li><a href="#" class="hover:text-white">Qendra e Ndihmës</a></li>
-                        <li><a href="#" class="hover:text-white">Kushtet e Shërbimit</a></li>
-                        <li><a href="#" class="hover:text-white">Politika e Privatësisë</a></li>
+                        <li><a href="{{ route('legal') }}" class="hover:text-white">{{ __('arcade.terms_of_service') }}</a></li>
+                        <li><a href="{{ route('privacy') }}" class="hover:text-white">{{ __('arcade.privacy_policy') }}</a></li>
                     </ul>
                 </div>
             </div>

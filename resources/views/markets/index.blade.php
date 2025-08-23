@@ -1,25 +1,27 @@
 <x-app-layout>
     <div class="bg-gray-50 dark:bg-gray-900 min-h-screen transition-theme">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <x-arcade-banner />
             <!-- Header Section -->
             <div class="mb-8">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 transition-theme">
-                            Tregjet e Parashikimeve
+                            {{ __('arcade.prediction_markets') }}
                         </h1>
                         <p class="text-gray-600 dark:text-gray-400 transition-theme">
-                            Tregtoni mbi ngjarjet e ardhshme dhe fitoni para reale nga parashikimet tuaja
+                            {{ __('arcade.markets_subtitle') }}
                         </p>
                     </div>
                     
                     @auth
                         <div class="mt-4 sm:mt-0">
-                            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-6 py-3 rounded-xl shadow-sm transition-theme">
-                                <span class="text-sm text-gray-500 dark:text-gray-400">Bilanci Juaj</span>
-                                <div class="font-bold text-2xl text-gray-900 dark:text-white transition-theme">
-                                    €{{ number_format(auth()->user()->balance, 2) }}
+                            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 px-6 py-3 rounded-xl shadow-sm transition-theme">
+                                <span class="text-sm text-blue-600 dark:text-blue-400">🎮 {{ __('arcade.arcade_tokens') }}</span>
+                                <div class="font-bold text-2xl text-blue-700 dark:text-blue-300 transition-theme">
+                                    {{ number_format(auth()->user()->balance, 0) }} {{ __('arcade.tokens') }}
                                 </div>
+                                <span class="text-xs text-blue-500 dark:text-blue-400">{{ __('arcade.no_monetary_value') }}</span>
                             </div>
                         </div>
                     @endauth

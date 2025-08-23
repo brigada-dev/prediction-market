@@ -87,6 +87,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the token purchases for the user.
+     */
+    public function tokenPurchases(): HasMany
+    {
+        return $this->hasMany(TokenPurchase::class);
+    }
+
+    /**
      * Get the user's initials derived from their name.
      */
     public function initials(): string

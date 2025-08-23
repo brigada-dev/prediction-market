@@ -29,6 +29,19 @@
                 <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
             </div>
 
+            <!-- Age Verification -->
+            <div class="mt-4">
+                <x-label for="age_verification">
+                    <div class="flex items-center">
+                        <x-checkbox name="age_verification" id="age_verification" required />
+
+                        <div class="ms-2">
+                            <span class="text-sm text-gray-600">{{ __('arcade.age_verification') }}</span>
+                        </div>
+                    </div>
+                </x-label>
+            </div>
+
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
                 <div class="mt-4">
                     <x-label for="terms">

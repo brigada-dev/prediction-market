@@ -16,30 +16,38 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <a href="{{ route('markets.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm px-3 py-2 transition-theme {{ request()->routeIs('markets.*') ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400' : '' }}">
-                        Tregjet
+                        {{ __('arcade.markets') }}
                     </a>
                     <a href="{{ route('prizes.index') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm px-3 py-2 transition-theme {{ request()->routeIs('prizes.*') ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400' : '' }}">
-                        Çmimet
+                        {{ __('arcade.prizes') }}
                     </a>
+                    @auth
+                        <a href="{{ route('tokens.purchase') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm px-3 py-2 transition-theme {{ request()->routeIs('tokens.*') ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400' : '' }}">
+                            🎮 {{ __('arcade.buy_tokens') }}
+                        </a>
+                    @endauth
                     <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm px-3 py-2 transition-theme">
-                        Rreth Nesh
+                        {{ __('arcade.about_us') }}
                     </a>
                     @auth
                         <a href="{{ route('dashboard') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium text-sm px-3 py-2 transition-theme {{ request()->routeIs('dashboard') ? 'border-b-2 border-blue-500 dark:border-blue-400 text-blue-600 dark:text-blue-400' : '' }}">
-                            Paneli Im
+                            {{ __('arcade.dashboard') }}
                         </a>
                     @endauth
                 </div>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-3">
+                <!-- Language Switcher -->
+                <x-language-switcher />
+                
                 <!-- Theme Toggle -->
                 <x-simple-theme-toggle />
 
                 @auth
-                    <!-- Balance Display -->
-                    <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-3 py-1.5 rounded-lg transition-theme">
-                        <span class="text-sm font-semibold text-green-700 dark:text-green-300">€{{ number_format(Auth::user()->balance, 2) }}</span>
+                    <!-- Token Balance Display -->
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 px-3 py-1.5 rounded-lg transition-theme" title="{{ __('arcade.no_monetary_value') }}">
+                        <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">🎮 {{ number_format(Auth::user()->balance, 0) }} {{ __('arcade.tokens') }}</span>
                     </div>
 
                     <!-- Settings Dropdown -->

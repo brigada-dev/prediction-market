@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RewardController;
+use App\Http\Controllers\TokenPurchaseController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -28,6 +29,15 @@ Route::get('/prizes', function () {
     return view('prizes.index');
 })->name('prizes.index');
 
+// Legal pages (public access)
+Route::get('/privacy', function () {
+    return view('privacy');
+})->name('privacy');
+
+Route::get('/legal', function () {
+    return view('legal');
+})->name('legal');
+
 // API routes (no auth required for market data)
 Route::prefix('api')->group(function () {
     Route::get('/markets/{market}/historical-prices', [MarketController::class, 'getHistoricalPrices'])->name('api.markets.historical-prices');
@@ -40,6 +50,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Trading routes
     Route::post('/markets/{market}/trade', [MarketController::class, 'trade'])->name('markets.trade');
     Route::post('/positions', [PositionController::class, 'store'])->name('positions.store');
+    
+    // Token purchase routes
+    Route::get('/purchase/tokens', [TokenPurchaseController::class, 'index'])->name('tokens.purchase');
+    Route::post('/purchase/tokens/intent', [TokenPurchaseController::class, 'createPurchaseIntent'])->name('tokens.purchase.intent');
+    Route::post('/purchase/tokens/complete', [TokenPurchaseController::class, 'completePurchase'])->name('tokens.purchase.complete');
     
     // Reward routes
     Route::post('/api/reward-tokens', [RewardController::class, 'rewardTokens'])->name('api.reward-tokens');

@@ -7,6 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <x-arcade-banner />
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl dark:shadow-gray-900/20 sm:rounded-lg transition-theme">
                 <x-welcome />
             </div>

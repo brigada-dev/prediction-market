@@ -13,6 +13,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public bool $age_verification = false;
 
     /**
      * Handle an incoming registration request.
@@ -23,6 +24,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'age_verification' => ['required', 'accepted'],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -84,6 +86,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
             :placeholder="__('Konfirmoni fjalëkalimin')"
             viewable
         />
+
+        <!-- Age Verification -->
+        <div class="flex items-center space-x-2">
+            <flux:checkbox wire:model="age_verification" required />
+            <label class="text-sm text-gray-600">
+                {{ __('arcade.age_verification') }}
+            </label>
+        </div>
 
         <div class="flex items-center justify-end">
             <flux:button type="submit" variant="primary" class="w-full">
